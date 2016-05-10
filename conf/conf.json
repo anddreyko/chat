@@ -1,0 +1,29 @@
+{
+    "port":5000
+  , "mongoose":{
+        "uri":"mongodb://localhost/chat"
+      , "options":{
+            "server":{
+                "socketOptions":{
+                    "KeepAlive": 1
+                }
+            }
+        }
+    }
+  , "session":{
+        "secret":"keyboardscat"
+      , "options":{
+            "server":{
+                "socketOptions":{
+                    "KeepAlive": 1
+                }
+            }
+        }
+      , "key":"sid"
+      , "cookie":{
+            "path": "/"
+          , "httpOnly": true
+          , "maxAge": 1
+        }
+    }
+}

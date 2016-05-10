@@ -1,0 +1,12 @@
+body, html{
+    background: #567483;
+}
+textarea, input[type="text"], input[type="password"]{
+    color: #000;
+}
+input[type="submit"]{
+    background: #fff;
+}
+input[type="submit"]:hover{
+    background: #ddd;
+}

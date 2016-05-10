@@ -1,0 +1,1 @@
+supervisor -i ./node_modules debug app

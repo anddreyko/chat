@@ -1,0 +1,21 @@
+<script src="https://cdn.socket.io/socket.io-1.4.5.js"></script>
+<form>
+    <div id="chat"></div>
+    <textarea name="text" id="text" cols="30" rows="10"></textarea>
+    <input type="submit" class="submit" name="submit" data-loading-text="Вход..">
+</form>
+<script>
+    var socket = io.connect();
+    $('form').submit(function(){
+        socket.emit('message', $('#text').val(), function(t){
+            append(t);
+            $('#text').val('');
+        });
+        return false;
+    });
+    socket.on('message', append);
+    
+    function append(t){
+        $("#chat").append("<p>"+t+"</p>");
+    }
+</script>
