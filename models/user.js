@@ -1,8 +1,8 @@
 var crypto = require('crypto')
   , async = require('async')
-  , mongoose = require('lib/#mongoose')
+  , mongoose = require('../lib/#mongoose')
   , Schema = mongoose.Schema
-  , HttpError = require('error').HttpError;
+  , HttpError = require('../error').HttpError;
 var util = require('util');
 var schema = new mongoose.Schema({
     username: {

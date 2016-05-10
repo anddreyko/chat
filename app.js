@@ -1,13 +1,13 @@
 var express = require('express')
   , http = require('http')
-  , User = require('models/user').User
-  , HttpError = require('error').HttpError
-  , AuthErr = require('models/user').AuthErr
-  , log = require('lib/#log')(module)
-  , conf = require('conf')
+  , User = require('./models/user').User
+  , HttpError = require('./error').HttpError
+  , AuthErr = require('./models/user').AuthErr
+  , log = require('./lib/#log')(module)
+  , conf = require('./conf')
   , i18n = require('i18n')
   , async = require('async')
-  , mongoose = require('lib/#mongoose')
+  , mongoose = require('./lib/#mongoose')
   , mongoStore = require('connect-mongostore')(express)
   , sessionConfig = {
         secret: conf.get('session:secret')
@@ -20,10 +20,10 @@ var express = require('express')
       , store: new mongoStore({'db': 'sessions'})
     }
   , app = express()
-  , auth = require('lib/auth')
+  , auth = require('./lib/auth')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
-  , port = process.env.PORT || 5000;
+  , port = process.env.PORT || conf.get('port');
 app.configure(function() {
     app.engine('html', require('uinexpress').__express);
     app.set('view engine', 'html');
@@ -42,8 +42,8 @@ app.use(i18n.init);
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.session(sessionConfig));
-app.use(require('lib/resExtensions'));
-app.use(require('lib/loadUser'));
+app.use(require('./lib/resExtensions'));
+app.use(require('./lib/loadUser'));
 app.get('/', auth, function(req, res){
     res.render('index.html', {title:__('Containers')});
 });
