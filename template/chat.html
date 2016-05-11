@@ -1,8 +1,8 @@
-<script src="/socket.io/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script> 
 <form>
     <div id="chat"></div>
-    <textarea name="text" id="text" cols="30" rows="10"></textarea>
-    <input type="submit" class="submit" name="submit" data-loading-text="Вход..">
+    <textarea name="text" id="text"></textarea>
+    <input type="submit" class="submit" name="submit">
 </form>
 <script>
     var socket = io.connect();
@@ -16,6 +16,6 @@
     socket.on('message', append);
     
     function append(t){
-        $("#chat").append("<p>"+t+"</p>");
+        $('#chat').append('<p>'+t+'</p>');
     }
 </script>
