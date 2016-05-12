@@ -3,8 +3,10 @@
   "version": "0.0.1",
   "dependencies": {
     "async": "^2.0.0-rc.2",
+    "connect": "^3.4.1",
     "connect-mongo": "^1.1.0",
     "connect-mongostore": "^0.1.4",
+    "cookie": "^0.2.3",
     "crypto": "0.0.3",
     "debug": "^2.2.0",
     "error": "^7.0.2",
@@ -14,6 +16,7 @@
     "mongoose": "^4.4.12",
     "nconf": "^0.8.4",
     "socket.io": "^1.4.6",
+    "socket.io-handshake": "0.0.10",
     "uinexpress": "0.0.5",
     "winston": "^2.2.0"
   },

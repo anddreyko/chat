@@ -1,21 +1,46 @@
-<script src="/socket.io/socket.io.js"></script> 
+<script src="./js/socket.io.js"></script>
 <form>
     <div id="chat"></div>
     <textarea name="text" id="text"></textarea>
     <input type="submit" class="submit" name="submit">
 </form>
 <script>
-    var socket = io.connect();
+    var socket = io.connect('', {
+        'reconnect': false
+    });
     $('form').submit(function(){
         socket.emit('message', $('#text').val(), function(t){
-            append(t);
+            printmessage(t);
             $('#text').val('');
         });
         return false;
     });
-    socket.on('message', append);
+    socket
+        .on('message', function(username, message){
+            printmessage(username+' > '+message);
+        })
+        .on('leave', function(username){
+            printmessage(username+' leaved');
+        })
+        .on('join', function(username){
+            printmessage(username+' joined');
+        })
+        .on('connect', function(){
+            printmessage('соединение установлено');
+        })
+        .on('disconnect', function(){
+            printmessage('соединение потеряно');
+        })
+        .on('logout', function(){
+            location.href='/';
+        })
+        .on('error', function(){
+            setTimeout(function(){
+                socket.socket.connect();
+            }, 500);
+        });
     
-    function append(t){
+    function printmessage(t){
         $('#chat').append('<p>'+t+'</p>');
     }
 </script>

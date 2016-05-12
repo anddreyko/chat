@@ -9,6 +9,7 @@ var express = require('express')
   , async = require('async')
   , mongoose = require('./lib/#mongoose')
   , mongoStore = require('connect-mongostore')(express)
+  , sessionStore = require('./lib/#sessionStore')
   , sessionConfig = {
         secret: conf.get('session:secret')
       , cookie: {
@@ -17,7 +18,7 @@ var express = require('express')
             httpOnly: true
         }
       , key: "sid"
-      , store: new mongoStore({'db': 'sessions'})
+      , store: sessionStore
     }
   , app = express()
   , auth = require('./lib/auth')
@@ -50,9 +51,14 @@ app.get('/', auth, function(req, res){
 app.get('/login', function(req, res) {
     res.render('login.html', {title:__('Containers')});
 });
-app.get('/logout', function(req, res) {
-    req.session.destroy();
-    res.redirect('/login');
+app.get('/logout', function(req, res, next) {
+    var sid = req.session.id
+      , io = req.app.get('io');
+    req.session.destroy(function(err){
+        io.sockets.emit('session:reload', sid);
+        if(err) return next(err);
+        res.redirect('/');
+    });
 });
 app.get('/chat', function(req, res) {
     res.render('chat.html', {title:__('Containers')});
@@ -62,7 +68,6 @@ app.post('/login', function(req, res, next) {
     var password = req.body.password;
     User.authentification(username, password, function(err, user){
         if(err){
-            //res.redirect('/login');
             if(err instanceof AuthErr)
                 return next(new HttpError(403, err.message));
             else
@@ -95,10 +100,5 @@ app.use(function(err, req, res, next) {
 server.listen(port, function(){
     log.info(port);
 });
-io.sockets.on('connection', function(s){
-    s.on('message', function(t, d){
-        s.broadcast.emit('message', t);
-        d && d(t);
-    });
-});
-
+require('./socket')(server);
+app.set('io', io);
