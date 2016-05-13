@@ -42,12 +42,12 @@ module.exports = function(server){
                 loadSession(sid, callback);
             }
           , function (session, callback){
-                if(!session) callback(new HttpError(401, 'No session'));
+                if(!session) return callback(new HttpError(401, 'No session'));
                 handshake.request.session = session;
                 loadUser(session, callback);
             }
           , function (user, callback){
-                if(!user) callback(new HttpError(403, 'Anonymous session may not connect'));
+                if(!user) return callback(new HttpError(403, 'Anonymous session may not connect'));
                 handshake.request.user = user;
                 callback(null);
             }
@@ -58,7 +58,7 @@ module.exports = function(server){
         })
     });
     io.sockets.on('session:reload', function(sid){
-        log.info('logout');
+        log.error('session:reload');
         var clients = io.sockets.clients();
         clients.forEach(function(client){
             if(client.request.session.id != sid) return;
@@ -74,20 +74,19 @@ module.exports = function(server){
                     return;
                 }
                 client.request.session = session;
-                log.error(client.request.session);
             });
         })
     });
     io.sockets.on('connection', function(s){
-        //var username = s.request.user.get('username');
-        //s.broadcast.emit('join', '');
-        // s.on('message', function(t, d){
-            // s.broadcast.emit('message', '', t);
-            // d && d(t);
-        // });
-        // s.on('leave', function(){
-            // s.broadcast.emit('leave', '');
-        // });
+        var username = !!s.request.user?s.request.user.get('username'):'username';
+        s.broadcast.emit('join', username);
+        s.on('message', function(t, d){
+            s.broadcast.emit('message', username, t);
+            d && d(t);
+        });
+        s.on('leave', function(){
+            s.broadcast.emit('leave', username);
+        });
     });
     return io;
 }
