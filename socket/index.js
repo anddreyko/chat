@@ -78,14 +78,22 @@ module.exports = function(server){
         })
     });
     io.sockets.on('connection', function(s){
-        var username = !!s.request.user?s.request.user.get('username'):'username';
-        s.broadcast.emit('join', username);
+        var username = !!s.request.user?s.request.user.get('username'):'anonymous';
+        //s.broadcast.emit('join', username);
         s.on('message', function(t, d){
-            s.broadcast.emit('message', username, t);
-            d && d(t);
+            u = username;
+            s.broadcast.emit('message', u, t);
+            d && d(u, t);
+        });
+        s.on('join', function(d){
+            u = username!='anonymous'?username:'';
+            s.broadcast.emit('join', u);
+            d && d(u);
         });
         s.on('leave', function(){
-            s.broadcast.emit('leave', username);
+            u = username!='anonymous'?username:'';
+            s.broadcast.emit('leave', u);
+            d && d(u);
         });
     });
     return io;
