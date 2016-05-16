@@ -1,0 +1,26 @@
+write to mongodb
+read from mongodb
+build game-panel
+build score
+sync mongodb from heroku
+add event n animation from game-panel
+add classes game n player
+add inicialization game
+add preloader
+add error tno clien js
+
+game{
+    tourOwn: playerID
+  , players: {
+        userID
+      , color
+      , money
+      , ship:{
+            state:[portID, islandID, sea]
+        }
+      , island
+      , card
+    }
+  , state: [start, run, finish]
+  , 
+}

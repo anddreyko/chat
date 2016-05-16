@@ -1,4 +1,6 @@
 {
 	"Containers": "Контейнеры",
-	"en": "ru"
+	"en": "ru",
+	"err Password": "Не верный пароль!",
+	"input login": "Введите логин!"
 }

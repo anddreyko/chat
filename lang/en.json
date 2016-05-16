@@ -1,3 +1,6 @@
 {
-	"Containers":"Containers"
+	"Containers":"Containers",
+	"en": "en",
+	"err Password": "Incorrect password",
+	"input login": "Enter login"
 }

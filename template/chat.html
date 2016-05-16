@@ -1,8 +1,22 @@
-<form>
-    <div id="chat"></div>
-    <textarea name="text" id="text"></textarea>
-    <input type="submit" class="submit" name="submit">
-</form>
-<div id="online"><h1>Игроки</h1></div>
+<!--
+<div id="online"><h1>Игроки</h1></div>-->
+<div class="desk">
+    <form class="chat">
+        <div id="chat"><div id="empty">чат пуст</div></div>
+        <textarea placeholder="Отправить сообщение: Enter" name="text" id="text"></textarea>
+        <input type="submit" class="submit" name="submit">
+    </form>
+    <form class="game-panel">
+        <div id="tour">ходит</div>
+        <div id="tour-name">anddreyko</div>
+        <div class="title">Предварительное действие</div>
+        <div class="">взять кредит</div>
+        <div class="title">Первое действие</div>
+        <div class="">Выбрать</div>
+        <div class="title">Второе действие</div>
+        <div class="">Выбрать</div>
+    </form>
+    <%=interface%>
+</div>
 <script src="./js/socket.io.js"></script>
 <script src="./js/socket.io.game.client.js"></script>

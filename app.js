@@ -10,7 +10,7 @@ var express = require('express')
   , mongoose = require('./lib/#mongoose')
   , mongoStore = require('connect-mongostore')(express)
   , sessionStore = require('./lib/#sessionStore')
-  , sessionConfig = {
+  , sesionConf = {
         secret: conf.get('session:secret')
       , cookie: {
             path: "/",
@@ -42,14 +42,15 @@ i18n.configure({
 app.use(i18n.init);
 app.use(express.bodyParser());
 app.use(express.cookieParser());
-app.use(express.session(sessionConfig));
+app.use(express.session(sesionConf));
 app.use(require('./lib/resExtensions'));
 app.use(require('./lib/loadUser'));
-app.get('/', auth, function(req, res){
-    res.render('index.html', {title:__('Containers')});
+app.get('/', function(req, res){
+    res.redirect('/chat');
 });
 app.get('/login', function(req, res) {
-    res.render('login.html', {title:__('Containers')});
+    if(req.session.user) res.redirect('/');
+    else res.render('login.html', {title:__('Containers')+' | Вход', error:['']});
 });
 app.get('/logout', function(req, res, next) {
     var sid = req.session.id
@@ -60,12 +61,15 @@ app.get('/logout', function(req, res, next) {
         res.redirect('/');
     });
 });
-app.get('/chat', function(req, res) {
-    res.render('chat.html', {title:__('Containers')});
+app.get('/chat', auth, function(req, res, next) {
+    require('fs').readFile(__dirname+'/template/interface.svg', function (err, data) {
+        if(err) next(new HttpError(500, err.message));
+        res.render('chat.html', {title:__('Containers')+' | Игра', interface: data.toString()});
+    });
 });
 app.post('/login', function(req, res, next) {
-    var username = req.body.username;
-    var password = req.body.password;
+    var username = req.body.username.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').trim();
+    var password = req.body.password.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').trim();
     User.authentification(username, password, function(err, user){
         if(err){
             if(err instanceof AuthErr)
@@ -78,7 +82,15 @@ app.post('/login', function(req, res, next) {
         res.send();
     });
 });
-
+app.use(function(req, res, next) {
+  res.status(404).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','404']});
+});
+app.use(function(req, res, next) {
+  res.status(403).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','403']});
+});
+app.use(function(req, res, next) {
+  res.status(500).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','500']});
+});
 app.use(function(err, req, res, next) {
     if (typeof err == 'number') {
         err = new HttpError(err);

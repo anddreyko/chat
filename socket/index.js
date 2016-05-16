@@ -80,17 +80,20 @@ module.exports = function(server){
     io.sockets.on('connection', function(s){
         var username = !!s.request.user?s.request.user.get('username'):'anonymous';
         //s.broadcast.emit('join', username);
-        s.on('message', function(t, d){
-            u = username;
-            s.broadcast.emit('message', u, t);
-            d && d(u, t);
+        s.on('message', function(m, d){
+            m = m.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').trim();
+            if(m){
+                u = username;
+                s.broadcast.emit('message', u, m);
+                d && d(u, m);
+            }
         });
         s.on('join', function(d){
             u = username!='anonymous'?username:'';
             s.broadcast.emit('join', u);
             d && d(u);
         });
-        s.on('leave', function(){
+        s.on('leave', function(d){
             u = username!='anonymous'?username:'';
             s.broadcast.emit('leave', u);
             d && d(u);

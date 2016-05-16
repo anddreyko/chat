@@ -873,7 +873,7 @@ textarea {
 }
 
 textarea {
-    min-height: 65px;
+    min-height: 30px;
     padding-top: 6px;
     padding-bottom: 6px;
 }
@@ -1070,18 +1070,8 @@ img {
     max-width: 100%;
 }
 
-
-footer {
-    padding: 40px 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    z-index: -1;
-}
-footer .footer-stuff {
-    max-width: 640px;
-    margin: 0 auto;
-}
 .wrap{
-	position:				relative;
+	position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
 }
