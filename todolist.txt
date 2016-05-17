@@ -1,16 +1,11 @@
 write to mongodb
 read from mongodb
-build game-panel
-build score
 sync mongodb from heroku
 add event n animation from game-panel
 add classes game n player
 add inicialization game
-add preloader
-add error tno clien js
-
 game{
-    tourOwn: playerID
+    turnOwn: playerID
   , players: {
         userID
       , color
@@ -24,3 +19,9 @@ game{
   , state: [start, run, finish]
   , 
 }
+
+//build game-panel
+//add error no clien js
+//add function of security on input
+//add preloader
+//add user page

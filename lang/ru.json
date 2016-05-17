@@ -1,6 +1,8 @@
 {
+	"404": 404,
 	"Containers": "Контейнеры",
 	"en": "ru",
 	"err Password": "Не верный пароль!",
-	"input login": "Введите логин!"
+	"input login": "Введите логин!",
+	"Not Found": "Not Found"
 }

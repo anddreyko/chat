@@ -1,4 +1,5 @@
 var log = require('../lib/#log')(module)
+  , sec = require('../lib/#sec')
   , conf = require('../conf')
   , connect = require('connect')
   , cookieParser = require('cookie-parser')
@@ -81,7 +82,7 @@ module.exports = function(server){
         var username = !!s.request.user?s.request.user.get('username'):'anonymous';
         //s.broadcast.emit('join', username);
         s.on('message', function(m, d){
-            m = m.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').trim();
+            m = sec(m);
             if(m){
                 u = username;
                 s.broadcast.emit('message', u, m);

@@ -20,7 +20,9 @@ var express = require('express')
       , key: "sid"
       , store: sessionStore
     }
+  , ObjectID = require('mongodb').ObjectID
   , app = express()
+  , sec = require('./lib/#sec')
   , auth = require('./lib/auth')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
@@ -48,6 +50,21 @@ app.use(require('./lib/loadUser'));
 app.get('/', function(req, res){
     res.redirect('/chat');
 });
+app.get('/user', function(req, res, next){
+    res.render('user.html', {title:__('Containers')+' | Профиль', id:req.session.user});
+});
+app.get('/user-:id', function(req, res, next){
+    try{
+        var id = new ObjectID(req.params.id);
+    }catch(e){
+        return next(new HttpError(404));
+    }
+    User.findOne({_id:id}, function(err, user){
+        if(err) return next(err);
+        if(!user) return next(404);
+        res.render('user.html', {title:__('Containers')+' | Профиль', id:user});
+    });
+});
 app.get('/login', function(req, res) {
     if(req.session.user) res.redirect('/');
     else res.render('login.html', {title:__('Containers')+' | Вход', error:['']});
@@ -68,8 +85,8 @@ app.get('/chat', auth, function(req, res, next) {
     });
 });
 app.post('/login', function(req, res, next) {
-    var username = req.body.username.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').trim();
-    var password = req.body.password.replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\//g, '&#x2F;').trim();
+    var username = sec(req.body.username);
+    var password = sec(req.body.password);
     User.authentification(username, password, function(err, user){
         if(err){
             if(err instanceof AuthErr)
@@ -83,10 +100,11 @@ app.post('/login', function(req, res, next) {
     });
 });
 app.use(function(req, res, next) {
-  res.status(404).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','404']});
+  var err = res.status(404);
+  next(new HttpError(err));
 });
 app.use(function(req, res, next) {
-  res.status(403).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','403']});
+  res.status(403).render('error.html', {title:__('Containers')+' | Доступ запрещен', error:['true','403']});
 });
 app.use(function(req, res, next) {
   res.status(500).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','500']});

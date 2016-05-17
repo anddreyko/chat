@@ -17,6 +17,8 @@
         <script src="js/functions.js"></script>
     </head>
     <body>
+        <div id="no-js" style="z-index: 1000; width: 100%; top: 0; left: 0; right: 0; position: absolute; padding: 1%;"><div style="text-align: center;" >Сайт не будет полноценно работать без JavaScript.<br/>Пожалуйста, включите его в вашем браузере.</div><script>$('#no-js').remove();</script></div>
+        <div id="loading" style="z-index: 1000; position: fixed; height: 100%; width: 100%; background: #567483; "><div class="loading" style="" ></div><script>$('#loading').fadeTo(1500, 0, function(){$(this).remove();});</script></div>
             <% if(user){ %>
         <header>
             <div class="wrap">
