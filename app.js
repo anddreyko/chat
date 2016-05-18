@@ -50,24 +50,26 @@ app.use(require('./lib/loadUser'));
 app.get('/', function(req, res){
     res.redirect('/chat');
 });
-app.get('/user', function(req, res, next){
-    res.render('user.html', {title:__('Containers')+' | Профиль', id:req.session.user});
+app.get('/chat', auth, function(req, res, next) {
+    require('fs').readFile(__dirname+'/template/interface.svg', function (err, data) {
+        if(err) next(new HttpError(500, err.message));
+        res.render('chat.html', {title:__('Containers')+' | Игра', interface: data.toString()});
+    });
 });
-app.get('/user-:id', function(req, res, next){
-    try{
+app.get('/user', auth, function(req, res, next){
+    res.render('user.html', {title:__('Containers')+' | Профиль', id:res.locals.user});
+});
+app.get('/user-:id', auth, function(req, res, next){
+    /*try{
         var id = new ObjectID(req.params.id);
     }catch(e){
         return next(new HttpError(404));
-    }
-    User.findOne({_id:id}, function(err, user){
+    }*/
+    User.findOne({username:req.params.id}, function(err, user){
         if(err) return next(err);
         if(!user) return next(404);
-        res.render('user.html', {title:__('Containers')+' | Профиль', id:user});
+        res.render('user.html', {title:__('Containers')+' | Профиль', user:user});
     });
-});
-app.get('/login', function(req, res) {
-    if(req.session.user) res.redirect('/');
-    else res.render('login.html', {title:__('Containers')+' | Вход', error:['']});
 });
 app.get('/logout', function(req, res, next) {
     var sid = req.session.id
@@ -78,11 +80,9 @@ app.get('/logout', function(req, res, next) {
         res.redirect('/');
     });
 });
-app.get('/chat', auth, function(req, res, next) {
-    require('fs').readFile(__dirname+'/template/interface.svg', function (err, data) {
-        if(err) next(new HttpError(500, err.message));
-        res.render('chat.html', {title:__('Containers')+' | Игра', interface: data.toString()});
-    });
+app.get('/login', function(req, res) {
+    if(req.session.user) res.redirect('/');
+    else res.render('login.html', {title:__('Containers')+' | Вход', error:''});
 });
 app.post('/login', function(req, res, next) {
     var username = sec(req.body.username);
@@ -90,25 +90,26 @@ app.post('/login', function(req, res, next) {
     User.authentification(username, password, function(err, user){
         if(err){
             if(err instanceof AuthErr)
-                return next(new HttpError(403, err.message));
+                return next(new HttpError(401, err.message));
             else
                 return next(err);
         }
         req.session.user = user._id;
         res.redirect('/');
-        res.send();
     });
 });
 app.use(function(req, res, next) {
-  var err = res.status(404);
-  next(new HttpError(err));
+    err = res.status(404);
+    next(new HttpError(err.statusCode));
+});/*
+app.use(function(req, res, next) {
+    err = res.status(403);
+    next(new HttpError(err.statusCode));
 });
 app.use(function(req, res, next) {
-  res.status(403).render('error.html', {title:__('Containers')+' | Доступ запрещен', error:['true','403']});
-});
-app.use(function(req, res, next) {
-  res.status(500).render('error.html', {title:__('Containers')+' | Ошибка', error:['true','500']});
-});
+    err = res.status(500);
+    next(new HttpError(err.statusCode));
+});*/
 app.use(function(err, req, res, next) {
     if (typeof err == 'number') {
         err = new HttpError(err);

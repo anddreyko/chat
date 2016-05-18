@@ -1,6 +1,6 @@
 <form id="form-login" method="POST">
     <div class="logo"></div>
-    <%if(error[0]){%><div id="err"><%=error[1]%></div><%}%>
+    <%if(error){%><div id="err"><%=__(error.message)%></div><%}%>
     <input type="text" name="username" placeholder="Введите логин" required>
     <input type="password" name="password" placeholder="Введите пароль" required>
     <input type="submit" class="submit" name="submit" data-loading-text="Вход.." value="Войти">

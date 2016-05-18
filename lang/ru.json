@@ -4,5 +4,6 @@
 	"en": "ru",
 	"err Password": "Не верный пароль!",
 	"input login": "Введите логин!",
-	"Not Found": "Not Found"
+	"Not Found": "Not Found",
+	"Вы не авторизованы": "Вы не авторизованы"
 }

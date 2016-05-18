@@ -288,6 +288,14 @@ textarea, input[type="text"], input[type="password"]{
     border-bottom: 4px #b3b3b3 solid;
     background: #fff;
 }
+.first-turn .talk-credit.button:active,
+.second-turn .talk-credit.button:active{
+    color: #000;
+}
+.first-turn .talk-credit.button div:active,
+.second-turn .talk-credit.button div:active{
+    color: #888;
+}
 
 
 /*loading infinite progrees circle*/
@@ -304,11 +312,8 @@ textarea, input[type="text"], input[type="password"]{
     bottom: 0;
     left: 0;
     right: 0;
-   // -webkit-animation: spin 1s infinite steps(36);
-   // animation: spin 1s infinite steps(36);
     animation-name: spin;
     animation-duration: 1s;
-   // animation-timing-function: steps(36, end);
     animation-delay: initial;
     animation-iteration-count: infinite;
     animation-direction: initial;
