@@ -1,14 +1,9 @@
 var express = require('express')
   , http = require('http')
-  , User = require('./models/user').User
   , HttpError = require('./error').HttpError
-  , AuthErr = require('./models/user').AuthErr
   , log = require('./lib/#log')(module)
   , conf = require('./conf')
   , i18n = require('i18n')
-  , async = require('async')
-  , mongoose = require('./lib/#mongoose')
-  , mongoStore = require('connect-mongostore')(express)
   , sessionStore = require('./lib/#sessionStore')
   , sesionConf = {
         secret: conf.get('session:secret')
@@ -20,10 +15,7 @@ var express = require('express')
       , key: "sid"
       , store: sessionStore
     }
-  , ObjectID = require('mongodb').ObjectID
   , app = express()
-  , sec = require('./lib/#sec')
-  , auth = require('./lib/auth')
   , server = http.createServer(app)
   , io = require('socket.io').listen(server)
   , port = process.env.PORT || conf.get('port');
@@ -41,75 +33,14 @@ i18n.configure({
   , cookie: 'kontainer-game'
   , register: global
 });
+app.use(function(err, req, res, next) { log.info(req.headers.origin || req.headers.referer); next(); });
 app.use(i18n.init);
 app.use(express.bodyParser());
 app.use(express.cookieParser());
 app.use(express.session(sesionConf));
 app.use(require('./lib/resExtensions'));
 app.use(require('./lib/loadUser'));
-app.get('/', function(req, res){
-    res.redirect('/chat');
-});
-app.get('/chat', auth, function(req, res, next) {
-    require('fs').readFile(__dirname+'/template/interface.svg', function (err, data) {
-        if(err) next(new HttpError(500, err.message));
-        res.render('chat.html', {title:__('Containers')+' | Игра', interface: data.toString()});
-    });
-});
-app.get('/user', auth, function(req, res, next){
-    res.render('user.html', {title:__('Containers')+' | Профиль', id:res.locals.user});
-});
-app.get('/user-:id', auth, function(req, res, next){
-    /*try{
-        var id = new ObjectID(req.params.id);
-    }catch(e){
-        return next(new HttpError(404));
-    }*/
-    User.findOne({username:req.params.id}, function(err, user){
-        if(err) return next(err);
-        if(!user) return next(404);
-        res.render('user.html', {title:__('Containers')+' | Профиль', user:user});
-    });
-});
-app.get('/logout', function(req, res, next) {
-    var sid = req.session.id
-      , io = req.app.get('io');
-    req.session.destroy(function(err){
-        io.sockets.emit('session:reload', sid);
-        if(err) return next(err);
-        res.redirect('/');
-    });
-});
-app.get('/login', function(req, res) {
-    if(req.session.user) res.redirect('/');
-    else res.render('login.html', {title:__('Containers')+' | Вход', error:''});
-});
-app.post('/login', function(req, res, next) {
-    var username = sec(req.body.username);
-    var password = sec(req.body.password);
-    User.authentification(username, password, function(err, user){
-        if(err){
-            if(err instanceof AuthErr)
-                return next(new HttpError(401, err.message));
-            else
-                return next(err);
-        }
-        req.session.user = user._id;
-        res.redirect('/');
-    });
-});
-app.use(function(req, res, next) {
-    err = res.status(404);
-    next(new HttpError(err.statusCode));
-});/*
-app.use(function(req, res, next) {
-    err = res.status(403);
-    next(new HttpError(err.statusCode));
-});
-app.use(function(req, res, next) {
-    err = res.status(500);
-    next(new HttpError(err.statusCode));
-});*/
+require('./routes')(app);
 app.use(function(err, req, res, next) {
     if (typeof err == 'number') {
         err = new HttpError(err);
@@ -127,9 +58,7 @@ app.use(function(err, req, res, next) {
         }
     }
 });
-
+require('./socket')(server);
 server.listen(port, function(){
     log.info(port);
 });
-require('./socket')(server);
-app.set('io', io);

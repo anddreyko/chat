@@ -1,6 +1,9 @@
 body, html{
     background: #567483;
 }
+div{
+    text-shadow: 0 1px 0 rgba(200,200,200,0.555);
+}
 header{
     border-bottom: 2px solid rgba(0,0,0,0.75);
     -webkit-box-shadow: 0px 0px 2px 0px rgba(0,0,0,0.75);
@@ -297,7 +300,6 @@ textarea, input[type="text"], input[type="password"]{
     color: #888;
 }
 
-
 /*loading infinite progrees circle*/
 .loading{    font: 2em FontAwesome;
     text-rendering: auto;
@@ -322,7 +324,7 @@ textarea, input[type="text"], input[type="password"]{
 }
 .loading:before{
     content: '';
-    padding: 1em;
+    padding: 0.5em;
     background: url('../img/load.svg') no-repeat 50% 50%;
     -moz-background-size: 100%;
     -webkit-background-size: 100%;

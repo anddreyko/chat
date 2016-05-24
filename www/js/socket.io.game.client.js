@@ -1,12 +1,12 @@
 $(function(){
     var socket = io.connect('', { 'reconnect': false });
     $(".chat #text").keyup(function(e){
-        if(e.ctrlKey || (e.keyCode == 0xA || e.keyCode == 0xD)){
+        if(/*e.ctrlKey || */(e.keyCode == 0xA || e.keyCode == 0xD)){
             e.preventDefault();
             onmessage();
         }
     });
-    $('form').submit(function(){
+    $('form.chat').submit(function(){
         onmessage();
         return false;
     });
@@ -24,11 +24,20 @@ $(function(){
             //printmessage('соединение установлено');
         })
         .on('disconnect', function(){
-            //printmessage('соединение потеряно');
+            printmessage(['u','соединение потеряно']);
         })
-        .on('logout', function(){
-            location.href='/';
-        })
+        .on('logout', function () {
+            window.location.href = '/';
+        })/*
+        .on('error', function (reason) {
+            if (reason == 'handshake unauthorized') {
+                alert('вы вышли из сайта');
+            } else {
+                setTimeout(function () {
+                    socket.socket.connect();
+                }, 500);
+            }
+        });*/
         .on('error', function(){
             setTimeout(function(){
                 socket.connect();
@@ -36,6 +45,11 @@ $(function(){
         });
     socket.emit('join', function(e){
         //join(e);
+    });
+    $('.logout').click(function(e){
+        e.preventDefault();
+        socket.emit('logout');
+        $('.logout form').submit();
     });
     window.onbeforeunload = function () {
         socket.emit('leave', function(e){

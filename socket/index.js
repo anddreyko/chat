@@ -12,7 +12,7 @@ function loadSession(sid, callback){
     sessionStore.load(sid, function(err, session){
         if(arguments.length==0){
             return callback(null, null);
-        } else{
+        } else {
             return callback(null, session);
         }
     });
@@ -32,8 +32,7 @@ function loadUser(session, callback){
 }
 module.exports = function(server){
     var io = require('socket.io').listen(server);
-    io.set('origins', 'localhost:*');
-    
+    io.set('origins', conf.get('uri')+':*');
     io.use(function(handshake, callback){
         async.waterfall([
             function (callback){
@@ -80,7 +79,6 @@ module.exports = function(server){
     });
     io.sockets.on('connection', function(s){
         var username = !!s.request.user?s.request.user.get('username'):'anonymous';
-        //s.broadcast.emit('join', username);
         s.on('message', function(m, d){
             m = sec(m);
             if(m){
@@ -88,16 +86,36 @@ module.exports = function(server){
                 s.broadcast.emit('message', u, m);
                 d && d(u, m);
             }
-        });
-        s.on('join', function(d){
+        }).on('join', function(d){
             u = username!='anonymous'?username:'';
             s.broadcast.emit('join', u);
             d && d(u);
-        });
-        s.on('leave', function(d){
+        }).on('leave', function(d){
             u = username!='anonymous'?username:'';
             s.broadcast.emit('leave', u);
             d && d(u);
+        }).on('logout', function(){
+            var sid = s.request.session.id
+              , client;
+            Object.keys(io.sockets.clients().sockets).forEach(function(o){
+                client = io.sockets.clients().sockets[o];
+                if(client.request.session.id==sid){
+                    client.emit('logout');
+                    client.disconnect();
+                } else loadSession(sid, function(err, session){
+                    if(err){
+                        client.emit('error', 'server error');
+                        client.disconnect();
+                        return;
+                    }
+                    if(!session){
+                        client.emit('logout');
+                        client.disconnect();
+                        return;
+                    }
+                });
+            });
+            s.request.session.destroy();
         });
     });
     return io;
